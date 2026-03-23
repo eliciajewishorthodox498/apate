@@ -1,0 +1,25 @@
+# Rust build artifacts
+/target
+
+# Key files — never commit secrets
+*.key
+
+# Apate manifest files (encrypted, but still sensitive)
+*.apate
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+.claude/
+
+# Internal docs — the goddess keeps her secrets
+/docs/
+
+# Test output
+/tmp/

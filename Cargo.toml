@@ -1,0 +1,76 @@
+[package]
+name = "apate-rs"
+version = "0.1.0"
+edition = "2024"
+authors = ["Dave Riding <david@netviper.gr>"]
+description = "Keyed reversible source code obfuscator — goddess of deceit"
+license = "WTFPL"
+repository = "https://github.com/dmriding/apate"
+
+[lib]
+name = "apate"
+
+[[bin]]
+name = "apate"
+path = "src/main.rs"
+
+[dependencies]
+# AST parsing for Rust source
+syn = { version = "2", features = ["full", "parsing", "printing", "visit", "visit-mut", "extra-traits"] }
+quote = "1"
+proc-macro2 = { version = "1", features = ["span-locations"] }
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Crypto / keying
+hmac = "0.12"
+sha2 = "0.10"
+blake3 = "1"
+aes-gcm = "0.10"
+rand = "0.8"
+rand_chacha = "0.3"
+
+# Serialization (manifest storage)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+bincode = "1"
+
+# Unicode homoglyphs
+unicode-normalization = "0.1"
+
+# Error handling
+anyhow = "1"
+thiserror = "1"
+
+# File walking
+walkdir = "2"
+
+# Colored terminal output
+colored = "2"
+
+# Source code formatting after transforms
+prettyplease = "0.2"
+base64 = "0.22.1"
+
+# Temp files for verify command
+tempfile = "3"
+
+# Cargo.toml parsing for external crate detection
+toml = "0.8"
+
+# Progress bars and spinners for CLI UX
+indicatif = "0.17"
+
+# rust-analyzer semantic analysis — real name resolution for rename pass
+ra_ap_ide = "=0.0.325"
+ra_ap_ide_db = "=0.0.325"
+ra_ap_hir = "=0.0.325"
+ra_ap_project_model = "=0.0.325"
+ra_ap_vfs = "=0.0.325"
+ra_ap_load-cargo = "=0.0.325"
+ra_ap_syntax = "=0.0.325"
+ra_ap_hir_ty = "=0.0.325"
+
+[dev-dependencies]
+pretty_assertions = "1"
