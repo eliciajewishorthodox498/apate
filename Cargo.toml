@@ -1,6 +1,6 @@
 [package]
 name = "apate-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["Dave Riding <david@netviper.gr>"]
 description = "Keyed reversible source code obfuscator — goddess of deceit"

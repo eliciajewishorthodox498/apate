@@ -64,6 +64,8 @@ pub struct SemanticAnalyzer {
     vfs: vfs::Vfs,
     /// Map from VFS FileId → relative file path
     file_paths: HashMap<vfs::FileId, PathBuf>,
+    /// Absolute path to the crate root directory
+    crate_dir: PathBuf,
 }
 
 impl SemanticAnalyzer {
@@ -111,6 +113,7 @@ impl SemanticAnalyzer {
             db,
             vfs,
             file_paths,
+            crate_dir: crate_dir.to_path_buf(),
         })
     }
 
@@ -192,7 +195,51 @@ impl SemanticAnalyzer {
             }
         }
 
+        // Normalize byte offsets from CRLF (raw file) to LF (proc_macro2/syn).
+        // RA returns byte ranges based on raw file content (CRLF on Windows),
+        // but proc_macro2 spans use LF-normalized positions. Adjust here so
+        // lookups in SemanticRenamer match correctly.
+        let refs = self.normalize_crlf_offsets(refs, &self.crate_dir);
+
         Ok(LocalDefMap { refs })
+    }
+
+    /// Convert CRLF-based byte offsets to LF-based offsets.
+    ///
+    /// RA returns byte ranges based on raw file content (CRLF on Windows),
+    /// but proc_macro2 spans use LF-normalized positions. For each file,
+    /// count `\r` bytes before each offset position and subtract them.
+    fn normalize_crlf_offsets(
+        &self,
+        refs: HashMap<(PathBuf, u32, u32), String>,
+        crate_dir: &Path,
+    ) -> HashMap<(PathBuf, u32, u32), String> {
+        let mut cr_positions: HashMap<PathBuf, Vec<u32>> = HashMap::new();
+
+        let mut normalized = HashMap::new();
+        for ((file, start, end), name) in refs {
+            let crs = cr_positions.entry(file.clone()).or_insert_with(|| {
+                let abs_path = crate_dir.join(&file);
+                match std::fs::read(&abs_path) {
+                    Ok(contents) => contents
+                        .iter()
+                        .enumerate()
+                        .filter(|(_, b)| **b == b'\r')
+                        .map(|(i, _)| i as u32)
+                        .collect(),
+                    Err(_) => Vec::new(),
+                }
+            });
+
+            let cr_before_start = crs.partition_point(|&pos| pos < start) as u32;
+            let cr_before_end = crs.partition_point(|&pos| pos < end) as u32;
+
+            normalized.insert(
+                (file, start - cr_before_start, end - cr_before_end),
+                name,
+            );
+        }
+        normalized
     }
 
     /// Collect all reference sites for a single definition within a search scope.

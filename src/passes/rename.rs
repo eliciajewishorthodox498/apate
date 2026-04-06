@@ -176,7 +176,7 @@ impl ObfuscationPass for RenamePass {
             mapping: &mapping,
             cross_file_registry: &cross_file_exports,
             local_struct_names: &collector.local_struct_names,
-            local_trait_names: &collector.local_trait_names,
+
             local_modules: &collector.local_modules,
             external_crates,
             crate_name,
@@ -215,7 +215,7 @@ impl ObfuscationPass for RenamePass {
 
         // For decrypt, all struct/trait names in the mapping are "local" (they were renamed)
         let local_struct_names: HashSet<String> = reverse.values().cloned().collect();
-        let local_trait_names: HashSet<String> = reverse.values().cloned().collect();
+
         // For decrypt, collect local modules from the AST as-is (with obfuscated names)
         let mut decrypt_collector = IdentCollector::new(false, None);
         decrypt_collector.visit_file(ast);
@@ -227,7 +227,7 @@ impl ObfuscationPass for RenamePass {
             mapping: &reverse,
             cross_file_registry: &empty_map,
             local_struct_names: &local_struct_names,
-            local_trait_names: &local_trait_names,
+
             local_modules: &local_modules,
             external_crates: &empty_set,
             crate_name: None,
@@ -345,27 +345,6 @@ impl<'a> SemanticRenamer<'a> {
             if let Some(replacement) = self.mapping.get(original_name) {
                 *ident = syn::Ident::new(replacement, ident.span());
             }
-        }
-    }
-
-    /// Position-based rename with name-based fallback for RA misses.
-    ///
-    /// Used for field access, struct literal fields, and pattern fields — positions
-    /// where RA's type inference may not resolve the receiver but where the name-based
-    /// fallback is safe (these can't be external module paths or crate names).
-    fn try_rename_with_fallback(&self, ident: &mut syn::Ident) {
-        let (byte_start, byte_end) = span_to_byte_range(ident, &self.line_starts);
-        if let Some(original_name) = self.local_def_map.get(&self.query_file, byte_start, byte_end)
-        {
-            if let Some(replacement) = self.mapping.get(original_name) {
-                *ident = syn::Ident::new(replacement, ident.span());
-                return;
-            }
-        }
-        // Fallback: name-based (safe here — fields can't be external paths)
-        let name = ident.to_string();
-        if let Some(replacement) = self.mapping.get(&name) {
-            *ident = syn::Ident::new(replacement, ident.span());
         }
     }
 
@@ -661,7 +640,6 @@ struct IdentCollector {
     body_locals: HashSet<String>,
     derive_idents: HashSet<String>,
     local_struct_names: HashSet<String>,
-    local_trait_names: HashSet<String>,
     local_modules: HashSet<String>,
     /// Item names imported from internal use statements (e.g., `use crate::error::{ApateError, Result}`
     /// → contains "ApateError", "Result"). These need cross-file registry lookups.
@@ -679,7 +657,6 @@ impl IdentCollector {
             body_locals: HashSet::new(),
             derive_idents: HashSet::new(),
             local_struct_names: HashSet::new(),
-            local_trait_names: HashSet::new(),
             local_modules: HashSet::new(),
             imported_items: HashSet::new(),
             crate_name: crate_info.map(|i| i.crate_name.clone()),
@@ -737,14 +714,6 @@ impl IdentCollector {
         }
     }
 
-    /// Check if a trait path refers to a locally-defined trait.
-    fn is_local_trait(&self, path: &syn::Path) -> bool {
-        if let Some(last) = path.segments.last() {
-            self.local_trait_names.contains(&last.ident.to_string())
-        } else {
-            false
-        }
-    }
 }
 
 impl<'ast> Visit<'ast> for IdentCollector {
@@ -804,7 +773,6 @@ impl<'ast> Visit<'ast> for IdentCollector {
 
     fn visit_item_trait(&mut self, node: &'ast syn::ItemTrait) {
         let name = node.ident.to_string();
-        self.local_trait_names.insert(name.clone());
         if !self.is_preserved_public(&node.vis) {
             self.add(&name);
         }
@@ -911,7 +879,6 @@ struct IdentRenamer<'a> {
     /// Full cross-file registry for looking up names accessed through module paths.
     cross_file_registry: &'a HashMap<String, String>,
     local_struct_names: &'a HashSet<String>,
-    local_trait_names: &'a HashSet<String>,
     local_modules: &'a HashSet<String>,
     external_crates: &'a HashSet<String>,
     crate_name: Option<&'a str>,
@@ -943,17 +910,6 @@ impl<'a> IdentRenamer<'a> {
     fn maybe_rename_member_with_cross_file(&self, member: &mut syn::Member) {
         if let syn::Member::Named(ident) = member {
             self.maybe_rename_with_cross_file(ident);
-        }
-    }
-
-    /// Check if a trait path refers to a locally-defined trait.
-    fn is_local_trait(&self, path: &syn::Path) -> bool {
-        if let Some(last) = path.segments.last() {
-            let name = last.ident.to_string();
-            self.local_trait_names.contains(&name)
-                || self.mapping.contains_key(&name)
-        } else {
-            false
         }
     }
 
