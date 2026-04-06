@@ -98,27 +98,23 @@ impl StringEncoder {
         if hash[0] == 0 { hash[1] | 1 } else { hash[0] }
     }
 
-    /// Generate keyed variable names for the decode block.
-    fn var_names(&self, index: usize) -> (String, String, String, String) {
+    /// Generate a keyed static name for the decode block.
+    fn static_name(&self, index: usize) -> String {
         let hash = crypto::hmac_sha256(&self.hmac_key, &index.to_le_bytes());
-        let data_name = format!("_x{:02x}{:02x}", hash[0], hash[1]);
-        let key_name = format!("_x{:02x}{:02x}", hash[2], hash[3]);
-        let buf_name = format!("_x{:02x}{:02x}", hash[4], hash[5]);
-        let idx_name = format!("_x{:02x}{:02x}", hash[6], hash[7]);
-        (data_name, key_name, buf_name, idx_name)
+        format!("_x{:02x}{:02x}", hash[0], hash[1])
     }
 
     /// Build the XOR decode block expression for a string.
+    ///
+    /// Uses `LazyLock` to decode once and cache the result, avoiding the
+    /// memory leak of `Box::leak` and the unsoundness of `from_utf8_unchecked`.
     fn build_decode_block(&self, value: &str, index: usize) -> syn::Expr {
         let xor_byte = self.derive_xor_byte(index);
         let xored: Vec<u8> = value.as_bytes().iter().map(|b| b ^ xor_byte).collect();
         let len = xored.len();
 
-        let (data_name, key_name, buf_name, idx_name) = self.var_names(index);
-        let data_ident = syn::Ident::new(&data_name, proc_macro2::Span::call_site());
-        let key_ident = syn::Ident::new(&key_name, proc_macro2::Span::call_site());
-        let buf_ident = syn::Ident::new(&buf_name, proc_macro2::Span::call_site());
-        let idx_ident = syn::Ident::new(&idx_name, proc_macro2::Span::call_site());
+        let static_name = self.static_name(index);
+        let static_ident = syn::Ident::new(&static_name, proc_macro2::Span::call_site());
 
         let xored_tokens: Vec<proc_macro2::TokenStream> = xored
             .iter()
@@ -133,15 +129,18 @@ impl StringEncoder {
 
         syn::parse_quote! {
             {
-                const #data_ident: [u8; #len_lit] = [#(#xored_tokens),*];
-                const #key_ident: u8 = #xor_lit;
-                let mut #buf_ident = #data_ident;
-                let mut #idx_ident = 0usize;
-                while #idx_ident < #buf_ident.len() {
-                    #buf_ident[#idx_ident] ^= #key_ident;
-                    #idx_ident += 1;
-                }
-                unsafe { &*Box::leak(String::from_utf8_unchecked(#buf_ident.to_vec()).into_boxed_str()) }
+                static #static_ident: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| {
+                    const __D: [u8; #len_lit] = [#(#xored_tokens),*];
+                    const __K: u8 = #xor_lit;
+                    let mut __b = __D;
+                    let mut __i = 0usize;
+                    while __i < __b.len() {
+                        __b[__i] ^= __K;
+                        __i += 1;
+                    }
+                    String::from_utf8(__b.to_vec()).expect("apate: invalid utf8")
+                });
+                #static_ident.as_str()
             }
         }
     }
@@ -203,29 +202,23 @@ struct StringDecoder {
 }
 
 impl StringDecoder {
-    /// Check if an expression is a XOR decode block (contains unsafe from_utf8_unchecked).
+    /// Check if an expression is a XOR decode block.
+    ///
+    /// Recognizes both the new `LazyLock` pattern and the legacy `Box::leak` +
+    /// `from_utf8_unchecked` pattern for backwards compatibility.
     fn is_decode_block(expr: &syn::Expr) -> bool {
         if let syn::Expr::Block(block) = expr {
-            // Look for an unsafe block containing from_utf8_unchecked
-            for stmt in &block.block.stmts {
-                if let syn::Stmt::Expr(expr, _) = stmt
-                    && Self::contains_from_utf8_unchecked(expr)
-                {
-                    return true;
-                }
+            let tokens = quote::quote! { #block }.to_string();
+            // New pattern: LazyLock-based decode block
+            if tokens.contains("LazyLock") && tokens.contains("from_utf8") {
+                return true;
+            }
+            // Legacy pattern: unsafe Box::leak + from_utf8_unchecked
+            if tokens.contains("from_utf8_unchecked") {
+                return true;
             }
         }
         false
-    }
-
-    fn contains_from_utf8_unchecked(expr: &syn::Expr) -> bool {
-        match expr {
-            syn::Expr::Unsafe(unsafe_expr) => {
-                let tokens = quote::quote! { #unsafe_expr }.to_string();
-                tokens.contains("from_utf8_unchecked")
-            }
-            _ => false,
-        }
     }
 }
 
